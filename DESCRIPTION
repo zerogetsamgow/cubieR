@@ -15,8 +15,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports: 
     cubepalette (>= 0.1.0),
-    ggplot2,
-    ggrounded,
-    ggthemes
-Remotes: 
-    https://github.com/zerogetsamgow/cubepalette
+    cubethemes (>= 0.2.0),
+    ggplot2
+Remotes:  
+    https://github.com/zerogetsamgow/cubepalette,
+    https://github.com/zerogetsamgow/cubethemes
