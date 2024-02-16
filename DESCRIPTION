@@ -1,0 +1,22 @@
+Package: cubieR
+Title: A collection of tools for Cubies.
+Version: 0.1.0
+Authors@R: 
+    person("Samuel", "Gow", , "samuel.gow@cubegroup.com.au", role = c("aut", "cre"))
+Description: cubieR is a package containing tools to be used by staff at
+    Cube Group.  These tools are principally geoms, palettes and themes
+    used to ensure data visualisations are produced in accordance with the
+    Cube Group branding guidelines.
+License: FALSE
+URL: https://github.com/zerogetsamgow/cubieR
+BugReports: https://github.com/zerogetsamgow/cubieR/repo/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports: 
+    cubepalette (>= 0.1.0),
+    ggplot2,
+    ggrounded,
+    ggthemes
+Remotes: 
+    https://github.com/zerogetsamgow/cubepalette
