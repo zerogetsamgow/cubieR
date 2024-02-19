@@ -49,8 +49,6 @@ These can be used with {ggplot2} as shown below
 
 ```{r example, message=FALSE, warning=FALSE}
 library(cubieR)
-library(cubepalette)
-library(cubethemes)
 
 ggplot(
   data=ggplot2::mpg %>% 
@@ -58,7 +56,7 @@ ggplot(
     group_by(cyl, trans) %>% summarise(count=n()),
   aes(x=cyl,y=count,colour=trans, fill=trans))+
   geom_col_cube() +
-  scale_color_manual(guide=FALSE,values=cube_palettes_discrete$light) +
+  scale_color_manual(guide="none",values=cube_palettes_discrete$light) +
   scale_fill_manual(name="Transmission",values=cube_palettes_discrete$light, labels=stringr::str_to_title)+
   scale_x_continuous(name="Number of cyclinders")+
   scale_y_continuous(name="Count", 
