@@ -33,7 +33,7 @@ You can install the development version of cubieR like so:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("zerogetsamgow/cubepalette")
+devtools::install_github("zerogetsamgow/cubieR")
 ```
 
 ## Welcome to the cubieverse
