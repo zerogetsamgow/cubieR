@@ -18,7 +18,7 @@ You can install the development version of cubieR like so:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("zerogetsamgow/cubepalette")
+devtools::install_github("zerogetsamgow/cubieR")
 ```
 
 ## Welcome to the cubieverse
@@ -36,21 +36,18 @@ These can be used with {ggplot2} as shown below
 
 ``` r
 library(cubieR)
-library(cubepalette)
-library(cubethemes)
 
 ggplot(
-  data=ggplot2::mpg %>% 
-    mutate(trans=str_remove(trans,"\\(.*\\)")) %>%
-    group_by(cyl, trans) %>% summarise(count=n()),
-  aes(x=cyl,y=count,colour=trans, fill=trans))+
+  data=ggplot2::mpg |>  
+    mutate(trans = str_remove(trans,"\\(.*\\)")) |> 
+    group_by(cyl, trans) |> 
+    summarise(count = n()),
+  aes(x = cyl,y = count, colour = trans, fill = trans))+
   geom_col_cube() +
-  scale_color_manual(guide=FALSE,values=cube_palettes_discrete$light) +
-  scale_fill_manual(name="Transmission",values=cube_palettes_discrete$light, labels=stringr::str_to_title)+
-  scale_x_continuous(name="Number of cyclinders")+
-  scale_y_continuous(name="Count", 
-                     expand=c(0,0)
-                     )+
+  scale_color_manual(guide = "none", values = cube_palettes_discrete$light) +
+  scale_fill_manual(name = "Transmission", values = cube_palettes_discrete$light, labels = str_to_title) +
+  scale_x_continuous(name = "Number of cyclinders") +
+  scale_y_continuous(name = "Count",expand=c(0,0)) +
   theme_cube_green()
 ```
 

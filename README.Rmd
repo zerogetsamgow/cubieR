@@ -12,8 +12,6 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 
-library(ggplot2)
-library(magrittr)
 library(tidyverse)
 options(verbose=FALSE)
 ```
@@ -51,16 +49,15 @@ These can be used with {ggplot2} as shown below
 library(cubieR)
 
 ggplot(
-  data=ggplot2::mpg %>% 
-    mutate(trans=str_remove(trans,"\\(.*\\)")) %>%
-    group_by(cyl, trans) %>% summarise(count=n()),
-  aes(x=cyl,y=count,colour=trans, fill=trans))+
+  data=ggplot2::mpg |>  
+    mutate(trans = str_remove(trans,"\\(.*\\)")) |> 
+    group_by(cyl, trans) |> 
+    summarise(count = n()),
+  aes(x = cyl,y = count, colour = trans, fill = trans))+
   geom_col_cube() +
-  scale_color_manual(guide="none",values=cube_palettes_discrete$light) +
-  scale_fill_manual(name="Transmission",values=cube_palettes_discrete$light, labels=stringr::str_to_title)+
-  scale_x_continuous(name="Number of cyclinders")+
-  scale_y_continuous(name="Count", 
-                     expand=c(0,0)
-                     )+
+  scale_color_manual(guide = "none", values = cube_palettes_discrete$light) +
+  scale_fill_manual(name = "Transmission", values = cube_palettes_discrete$light, labels = str_to_title) +
+  scale_x_continuous(name = "Number of cyclinders") +
+  scale_y_continuous(name = "Count",expand=c(0,0)) +
   theme_cube_green()
 ```
