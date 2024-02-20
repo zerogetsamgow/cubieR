@@ -1,6 +1,6 @@
 Package: cubieR
 Title: A collection of tools for Cubies.
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person("Samuel", "Gow", , "samuel.gow@cubegroup.com.au", role = c("aut", "cre"))
 Description: cubieR is a package containing tools to be used by staff at
@@ -17,6 +17,8 @@ Imports:
     cubepalette (>= 0.1.0),
     cubethemes (>= 0.2.0),
     ggplot2
-Remotes:  
+Remotes: 
     https://github.com/zerogetsamgow/cubepalette,
     https://github.com/zerogetsamgow/cubethemes
+Depends: 
+    ggrounded
