@@ -30,7 +30,7 @@ geom_line_cube <-
     ...
   )
   {
-    ggplot2::geom_line(lineend=lineed, linewidth=linewidth, ...)
+    ggplot2::geom_line(lineend=lineend, linewidth=linewidth, ...)
   }
 
 #' Path plots in the Cube Group style rounded tops
@@ -65,6 +65,6 @@ geom_path_cube <-
     ...
   )
   {
-    ggplot2::geom_path(lineend=lineed, linewidth=linewidth, ...)
+    ggplot2::geom_path(lineend=lineend, linewidth=linewidth, ...)
   }
 
