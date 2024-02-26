@@ -4,16 +4,16 @@
 \alias{geom_line_cube}
 \title{Line plots in the Cube Group style rounded tops}
 \usage{
-geom_line_cube(lineend = "round", linewidth = 1.2, ...)
+geom_line_cube(..., lineend = "round", linewidth = 1.2)
 }
 \arguments{
-\item{lineend}{defaults to \code{"round"}to match the brand guidelines.}
-
-\item{linewidth}{defaults to 1.2 to produce generally clearer charts.}
-
 \item{...}{Other arguments passed on to \code{\link[ggplot2:geom_path]{ggplot2::geom_line()}} . These are
 often aesthetics, used to set an aesthetic to a fixed value, like
 \code{colour = "red"} . They may also be parameters to the paired geom/stat.}
+
+\item{lineend}{defaults to \code{"round"}to match the brand guidelines.}
+
+\item{linewidth}{defaults to 1.2 to produce generally clearer charts.}
 }
 \value{
 A ggplot object.
