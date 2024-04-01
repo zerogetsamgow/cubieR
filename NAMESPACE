@@ -3,3 +3,4 @@
 export(geom_col_cube)
 export(geom_line_cube)
 export(geom_path_cube)
+export(scale_colour_cube)
