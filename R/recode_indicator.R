@@ -16,4 +16,4 @@
 #' recode_indicator(indicators)
 #'
 #' # To be added# Define function to recode indicators
-recode_indicator = function(x) {if_else(x %in% c("Yes","yes","y","Y"), 1,0)}
+recode_indicator = function(x) {if_else(x %in% c("Yes","yes","y","Y",TRUE,1), 1,0)}
