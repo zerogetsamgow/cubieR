@@ -1,6 +1,6 @@
 Package: cubieR
 Title: A collection of tools for Cubies.
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: 
     person("Samuel", "Gow", , "samuel.gow@cubegroup.com.au", role = c("aut", "cre"))
 Description: cubieR is a package containing tools to be used by staff at
