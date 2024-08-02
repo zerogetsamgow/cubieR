@@ -152,7 +152,7 @@ ggplot(
         legend.direction = "vertical",
         legend.title = element_text(margin = margin(0,0,2,0,"mm")))
 
-## ----princeton_original, fig.cap = "Original visualisation", fig.height = 2----
+## ----princeton_original, fig.cap = "Original visualisation", fig.height = 2, fig.width = 6----
 princeton_aid.tbl = 
   read_csv(
     "c:/r/training/data/princeton_aid_example.csv",
@@ -178,7 +178,7 @@ ggplot(
   geom_text(
     show.legend=FALSE,
     colour = cube.darkgreen,
-    size = 7, 
+    size = 4, 
     position = position_stack(vjust = 0.5),
     fontface = "bold") +
   facet_grid(cols=vars(aid_year), switch = "x")+
@@ -198,7 +198,7 @@ ggplot(
         legend.justification = "left",
         legend.margin = margin(-10,0,0,0,"mm"))
 
-## ----princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 2----
+## ----princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 2, fig.width = 6----
 # Create plot in Cube Group style  
 ggplot(
   data = princeton_aid.tbl,  
@@ -237,7 +237,7 @@ ggplot(
   geom_text(
     show.legend=FALSE,
     colour = cube.darkgreen,
-    size = 7, 
+    size = 5, 
     position = position_stack(vjust = 0.5),
     fontface = "bold") +
   facet_grid(cols=vars(aid_year), switch = "x")+
@@ -257,7 +257,7 @@ ggplot(
         legend.justification = "left",
         legend.margin = margin(-5,0,0,0,"mm"))
 
-## ----princeton_line,  fig.cap = "Simplified visualisation", fig.height = 2----
+## ----princeton_line,  fig.cap = "Simplified visualisation", fig.height = 2, fig.width = 6----
 ggplot(
   data = princeton_aid.tbl|> filter(str_detect(name,"Rec")),
       aes(x = aid_year,

@@ -282,7 +282,7 @@ The above shows how we can construct charts in R. The following section is desig
 
 Kaiser Fung presented the interesting case of a chart from the Princeton alumni magazine reproduced below. As they note, the chart effectively communicates the key message - the share of students receiving financial aid has increased substantially. However, they question whether it is doing it efficiently.
 
-```{r princeton_original, fig.cap = "Original visualisation", fig.height = 2}
+```{r princeton_original, fig.cap = "Original visualisation", fig.height = 2, fig.width = 6}
 #| warnings: false  
 #| echo: false  
 princeton_aid.tbl = 
@@ -310,7 +310,7 @@ ggplot(
   geom_text(
     show.legend=FALSE,
     colour = cube.darkgreen,
-    size = 7, 
+    size = 4, 
     position = position_stack(vjust = 0.5),
     fontface = "bold") +
   facet_grid(cols=vars(aid_year), switch = "x")+
@@ -334,7 +334,7 @@ ggplot(
 Fung notes the chart above can be decomposed into two components. For us, these components are reflected in out code by geom_col and geom_text. We present this composition below. This decomposition allows us to consider which part of the original part of the chart is communicating the key message. 
 
 
-```{r princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 2}
+```{r princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 2, fig.width = 6}
 #| warnings: false   
 #| echo: false  
 
@@ -376,7 +376,7 @@ ggplot(
   geom_text(
     show.legend=FALSE,
     colour = cube.darkgreen,
-    size = 7, 
+    size = 5, 
     position = position_stack(vjust = 0.5),
     fontface = "bold") +
   facet_grid(cols=vars(aid_year), switch = "x")+
@@ -401,8 +401,8 @@ We can see that both charts still communicates the key message - the share of st
 
 If the former, it is worth considering whether geom_col with radial coordinates is the best geom_* for this purpose. We can present the same information in a visually simpler style using other geom_*s as shown below.
 
-```{r princeton_line,  fig.cap = "Simplified visualisation", fig.height = 2} 
-#| warnings: false   
+```{r princeton_line,  fig.cap = "Simplified visualisation", fig.height = 2, fig.width = 6} 
+#| warnings: false  
 #| echo: false    
 
 ggplot(
