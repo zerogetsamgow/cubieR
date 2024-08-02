@@ -1,0 +1,434 @@
+---
+title: "cubieR-charts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cubieR-charts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(verbose=FALSE)
+options(warn.conflicts=FALSE)
+options(tidyverse.quiet = TRUE)
+
+```
+
+
+# Introduction
+
+This document provides instructions on how to produce charts in R. The guide is intended to assist staff at Cube Group to produce a variety of charts using our styles and colours easily and efficiently
+
+The focus is producing plots using {ggplot2} and our in-house {cubethemes} and {cubepalette} packages.
+
+The guide assumes the reader has some familiarity with R.
+
+Required packages
+
+Before we start, it is important to ensure you have the required packages installed.
+
+These include:
+
+```{r}
+#| output: false 
+#| warnings: false
+
+library(tidyverse)
+library(scales, quietly = TRUE)
+
+```
+
+As with most coding excercises we will use several function from the tidyverse package. For example, we will create our charts using the `ggplot2` package from the `tidyverse`. `scales` allows us to easily format labels on our charts. 
+
+```{r}
+#| output: false
+#| warnings: false
+library(cubieR, quietly = TRUE)
+```
+
+The `cubieR` package loads `cubepalette` which enables you to plot in the Cube Group colours and `cubethemes` which provides simple themes for plots in the Cube Group style including theme_cube_map.
+
+# A simple bar plot
+
+We start by producing a simple bar plot using ggplot the built-in mtcars dataset .
+
+A sample of the data is shown below.
+
+``` {r}
+#| echo: false # Create table of data in this document 
+
+knitr::kable(head(mtcars))
+```
+
+All ggplot plots begin with the `ggplot()` function, which requires us to specify data and aesthetics (the latter using the `aes()` function.
+
+Aesthetics describe how variables in the data are mapped to visual properties and are contained passed to ggplot using the `aes()` function. For this example, we map one variable `cyl` to the aesthetic `x` (the horizontal axis) .
+
+We then add layers, scales, coords and facets to the plot.
+
+The first type of layer we want to add is a `geom_*`, which can be thought of as your chart type. There are many geom options, including bar, line, point. We will introduce several in this guide.
+
+For this example, we are going to add a bar chart layer using `geom_bar()`, which creates bar plots and automatically makes the height of each bar equal to the names of cases in our data.
+
+This comes together in the code and example plot below.
+
+``` {r simple_bar,  fig.height = 4, fig.width = 6}
+#| warnings: false
+# Create plot in base style
+ggplot(
+  data = mtcars,
+  aes(x = cyl)
+  ) +
+geom_bar()
+```
+
+This code produces a bar chart, but one with very simple formatting. You can see that our horizontal axis uses values from the `cyl` variable and as noted above, we have bars with the height equal to the count of each value.
+
+We can add additional lines to our code to improve the formatting.
+
+## Adding a theme
+
+To make it easier to quickly format charts in the Cube Group style, we have created a set of themes theme_cube_*. A theme comprises information on the colours, fonts and line styles you want the base of your plot to use.
+
+Importantly a theme_cube_* doesn't change the colours of your `geom_*`. We do that separately by specifying fill inside geom_bar. Note most `geom_*` have two colour variable fill - the inside colour - and colour - the border colour.
+
+Let's see what are chart looks like with a theme and fill.
+
+``` {r themed_bar,  fig.height = 4, fig.width = 6}
+#| warnings: false 
+# Create plot in Cube Group style 
+ggplot(
+  data = mtcars,
+  aes(x = cyl)
+  ) + 
+  geom_bar(fill = cube.darkgreen) +
+  theme_cube_grey()
+```
+
+This code produces a nicer looking chart, but some features could be improved, most notably the axes.
+
+The `cyl` variable in mtcars takes three values - 4,6 and 8 - but our x axis shows integers from 3 to 9. The axis title lacks clarity as well. This axis also somewhat oddly sits below 0 on the y axis. Our bar chart also extends beyond the upper value on our y axis.
+
+## Adding axis scales
+
+We can use `scale_x_*` and `scale_y_*` to resolve these issues. The value of * in these functions depend on the type of data we have mapped to x or y. In this case both cyl and count are continuous numerical variables so we use `scale_*_continuous`
+
+We will use the `name` , `breaks`, `expand` and `limits` arguments of these functions to improve the look of the axes.
+
+The role of the first two arguments is fairly obvious. One sets the name of the axis that is displayed as the axis title, the other sets the breaks along the axis that labels appear at. For `name` we supply the value we want displayed. For `breaks`, we provide an array of values. In this case we use the `seq()` function as it enables us to specify the values easily by providing the minimum, the maximum and the gap between values.
+
+ggplot by default adds space around the data to ensure they are not too close to the axis. We appreciate this default when it places our bars away from the vertical axis, but not the horizontal axis. 
+
+To remove the padding we add `expand = c(0,0)` to `scale_y_continuous`. We also use the `limits` variable to require the axis to extend from 0 to 15, resulting in the highest value label being greater than the height of our bars.
+
+``` {r scaled_bar,  fig.height = 4, fig.width = 6}
+#| warnings: false  
+# Create plot in Cube Group style with formatted axes
+ggplot(
+  data = mtcars,  
+  aes(x = cyl)) +
+  geom_bar(fill = cube.darkgreen) +
+  scale_x_continuous(
+    name = "Number of cylinders",
+    breaks = seq(4,8, by =2),
+      )+
+  scale_y_continuous(
+    name = "Number of cars in dataset",
+    expand = c(0,0),
+    limits = c(0,15)
+  )+
+  theme_cube_grey() 
+```
+
+So, we have a simple, neatly formatted bar plot that uses Cube colours and fonts. Let's look at adding more features and using some other `geom_*`s
+
+## Working with transformed data
+
+`geom_bar()` is a useful geom for disggregated data. However, often we
+the heights of the bars to represent values in the data. For this we can use `geom_col()` instead. 
+
+The syntax for `geom_col()` is closer to what we will use for other `geom_*`s like `geom_line()` and `geom_text()` as well, so it is helpful to explore it next.
+
+We start by aggregating our mtcars as shown in the code below which creates `mtcars.summary` - a tibble with three columns (`gear`,`cyl`,`count`) where the latter is a count of the number of observations in mtcars for each pair of `gear` and `cyl` .
+
+
+``` {r aggregate_mtcars}
+#| warnings: false  
+# Create a summary of mtcars grouped by gear and cyl
+mtcars.summary = 
+  mtcars |> 
+  group_by(gear, cyl) |> 
+  summarise(count = n(), .groups = "drop")
+
+knitr::kable(head(mtcars.summary))
+  
+```
+Let's recreate our plot using this summary data and `geom_col`. To do this we substitute `geom_col` for `geom_bar` in our code. We also need to assign the `y` aesthetic to our value in our data, in this case `y = count`.  
+
+``` {r scaled_col,  fig.height = 4, fig.width = 6}
+#| warnings: false  
+# Create plot in Cube Group style with formatted axes
+ggplot(
+  data = mtcars.summary,  
+  aes(x = cyl,
+      # Add y to our aesthetics
+      y = count)) +
+  # Substitute `geom_col` for `geom_bar`
+  geom_col(
+    fill = cube.darkgreen) +
+  scale_x_continuous(
+    name = "Number of cylinders",
+    breaks = seq(4,8, by =2),
+      )+
+  scale_y_continuous(
+    name = "Number of cars in dataset",
+    expand = c(0,0),
+    limits = c(0,15)
+  )+
+  theme_cube_grey() 
+```
+Note, even though mtcars.summary doesn't include a total count for each `cyl` value it shown in the chart. This is achieved by stacking the counts for each `gear` and `cyl`.
+
+We can add another aesthetic `'fill` to draw this out and show more information as shown in the following code
+
+
+``` {r filled_col,  fig.height = 4, fig.width = 6}
+#| warnings: false  
+ggplot(
+  data = mtcars.summary,  
+  aes(x = cyl,
+      y = count,
+      # Add `fill` to our aesthetics, we need to convert it to 
+      # a discrete variable to work with a discrete palette
+      fill = factor(gear)
+      )) +
+  geom_col() +
+  scale_x_continuous(
+    name = "Number of cylinders",
+    breaks = seq(4,8, by =2),
+      )+
+  scale_y_continuous(
+    name = "Number of cars in dataset",
+    expand = c(0,0),
+    limits = c(0,15)
+  )+
+  # Add a fill scale that uses a cube palette
+  scale_fill_manual(
+    name = "Number of gears", 
+    # Use index numbers to skip grey in the palette
+    values = cube_palettes$other[c(1:2,4)]) +
+  theme_cube_grey() +
+  # Move legend to the right to match bar column
+  theme(legend.position = "right",
+        legend.direction = "vertical",
+        legend.title = element_text(margin = margin(0,0,2,0,"mm")))
+```
+
+## Adding labels
+
+We can add labels to our columns using `geom_text`. Note this `geom` will default to placing the labels at the `y` value for each `gear` and `cyl` pair. We use the `position` variable to stack the values. By using the `position_stack()` function to do this, we can further adjust the position to the middle (vjust = .5) rather than the top of each segment.
+
+``` {r labelled_col,  fig.height = 4, fig.width = 6}
+ggplot(
+  data = mtcars.summary,  
+  aes(x = cyl,
+      y = count,
+      fill = factor(gear),
+      label = count
+      )) +
+  geom_col() +
+  # Add labels using geom_text
+  geom_text(
+    # Use a colour that will stand out on the fills
+    colour = cube.grey,
+    # Use position stack to line up with bars (rather than at y values)
+    # add vjust = .5 to place in middle of each fill
+    position = position_stack(vjust =.5)
+  ) +
+  
+  scale_x_continuous(
+    name = "Number of cylinders",
+    breaks = seq(4,8, by =2),
+      )+
+  scale_y_continuous(
+    name = "Number of cars in dataset",
+    expand = c(0,0),
+    limits = c(0,15)
+  )+
+  # Add a fill scale that uses a cube palette
+  scale_fill_manual(
+    name = "Number of gears", 
+    # Use index numbers to skip grey in the palette
+    values = cube_palettes$other[c(1:2,4)]) +
+  theme_cube_grey() +
+  # Move legend to the right to match bar column
+  theme(legend.position = "right",
+        legend.direction = "vertical",
+        legend.title = element_text(margin = margin(0,0,2,0,"mm")))
+```
+
+
+The following provides a more advanced example. This vignette will be updated to include other examples that bridge the gap between the above and below.
+
+# Visualisation for meaning
+
+The above shows how we can construct charts in R. The following section is designed to explore how we should construct charts in R. The difference involves applying judgement about the methods available to ensure that are charts are meaningful, while remaining accessible and easy to read.
+
+## The Princeton financial aid example
+
+Kaiser Fung presented the interesting case of a chart from the Princeton alumni magazine reproduced below. As they note, the chart effectively communicates the key message - the share of students receiving financial aid has increased substantially. However, they question whether it is doing it efficiently.
+
+```{r princeton_original, fig.cap = "Original visualisation", fig.height = 2}
+#| warnings: false  
+#| echo: false  
+princeton_aid.tbl = 
+  read_csv(
+    "c:/r/training/data/princeton_aid_example.csv",
+    show_col_types = FALSE) |> 
+  mutate(non_share=1-aid_share) |> 
+  pivot_longer(contains("share")) |> 
+  mutate(name = factor(name, 
+                       levels = c("non_share","aid_share"),
+                       labels = c("Not receiving aid","Receiving aid"))
+  )
+
+
+# Create plot in Cube Group style 
+ggplot(
+  data = princeton_aid.tbl,
+  aes(x = 1,
+      y = value,
+      fill = name,
+      label = scales::label_percent(accuracy = 1)(value)
+  )
+  ) + 
+  geom_col(width = 100) +
+  geom_text(
+    show.legend=FALSE,
+    colour = cube.darkgreen,
+    size = 7, 
+    position = position_stack(vjust = 0.5),
+    fontface = "bold") +
+  facet_grid(cols=vars(aid_year), switch = "x")+
+  # Using polar coordinates converts a col chart to a pie chart.
+  coord_polar("y") +
+  # We use theme_cube_map for a cleaner look
+  theme_cube_map(base_colour = "grey") +
+  labs(title = str_to_upper("Incoming Freshmen receiving aid"),
+       caption = str_to_upper("Source: Office of Admission"))+
+  scale_fill_manual(name = NULL, values = cube_palettes_discrete$base)+
+  theme(strip.text = 
+          element_text(
+            colour = cube.darkgreen, 
+            face = "bold",
+            margin = margin(1,1,1,1,"mm")),
+        legend.position = "bottom",
+        legend.justification = "left",
+        legend.margin = margin(-10,0,0,0,"mm"))
+```
+
+Fung notes the chart above can be decomposed into two components. For us, these components are reflected in out code by geom_col and geom_text. We present this composition below. This decomposition allows us to consider which part of the original part of the chart is communicating the key message. 
+
+
+```{r princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 2}
+#| warnings: false   
+#| echo: false  
+
+# Create plot in Cube Group style  
+ggplot(
+  data = princeton_aid.tbl,  
+  aes(
+    x = 1,    
+    y = value,  
+    fill = name,      
+    label = scales::label_percent(accuracy = 1)(value)
+    ) 
+  ) + 
+  geom_col(width = 100) +   
+  facet_grid(cols=vars(aid_year), switch = "x") + 
+  coord_polar("y") +  
+  theme_cube_map(base_colour = "grey") +  
+  labs(title = str_to_upper("Incoming Freshmen receiving aid"),
+       caption = str_to_upper("Source: Office of Admission"))+  
+  scale_fill_manual(name = NULL, values = cube_palettes_discrete$base) +  
+  theme(strip.text =
+          element_text(     
+            colour = cube.darkgreen,  
+            face = "bold",      
+            margin = margin(1,1,1,1,"mm")),  
+        legend.position = "bottom",        
+        legend.justification = "left",     
+        legend.margin = margin(-10,0,0,0,"mm"))
+
+ggplot(
+  data = princeton_aid.tbl |> filter(str_detect(name,"Rec")),
+  aes(x = 1,
+      y = value,
+      fill = name,
+      label = scales::label_percent(accuracy = 1)(value)
+  )
+  ) + 
+  geom_col(width = 100) +
+  geom_text(
+    show.legend=FALSE,
+    colour = cube.darkgreen,
+    size = 7, 
+    position = position_stack(vjust = 0.5),
+    fontface = "bold") +
+  facet_grid(cols=vars(aid_year), switch = "x")+
+  theme_cube_map(base_colour = "grey") +
+  labs(title = str_to_upper("Incoming Freshmen receiving aid"),
+       caption = str_to_upper("Source: Office of Admission"))+
+  scale_y_continuous(limits = c(0,1))+
+  scale_fill_manual(name = NULL, 
+                    values = (cube_palettes_discrete$base[1:2]),
+                    drop = FALSE)+
+  theme(strip.text = 
+          element_text(
+            colour = cube.darkgreen, 
+            face = "bold",
+            margin = margin(1,1,1,1,"mm")),
+        legend.position = "bottom",
+        legend.justification = "left",
+        legend.margin = margin(-5,0,0,0,"mm"))
+```
+
+We can see that both charts still communicates the key message - the share of students receiving financial aid has increased substantially. So, we could achieve our purpose using one or the other rather than needing to present both. Which to use depends on whether you wish to communicate visually (option 1) or textually (option 2). If the latter, it may be worth considering whether a table or prose may be a better format for the information you are presenting.
+
+If the former, it is worth considering whether geom_col with radial coordinates is the best geom_* for this purpose. We can present the same information in a visually simpler style using other geom_*s as shown below.
+
+```{r princeton_line,  fig.cap = "Simplified visualisation", fig.height = 2} 
+#| warnings: false   
+#| echo: false    
+
+ggplot(
+  data = princeton_aid.tbl|> filter(str_detect(name,"Rec")),
+      aes(x = aid_year,
+          y = value,       
+          colour = name,   
+          )
+      ) + 
+   # geom_line_cube(linejoin = "round")+
+    geom_smooth(method = "loess",
+                formula = 'y ~ x',
+                se=FALSE, 
+                linewidth = 2, 
+                lineend = "round")+
+    theme_cube_grey() +
+    labs(title = ("Incoming Freshmen receiving aid"),
+       caption = ("Source: Office of Admission"))+ 
+    scale_y_continuous(
+      labels = scales::label_percent(suffix = " %"), 
+      name = NULL, 
+      limits = c(.4,.7)) +
+  
+    scale_x_continuous(breaks = seq(1998,2023, by = 5), name = NULL) +
+    scale_colour_manual(
+      guide = NULL, name = NULL, values = cube_palettes_discrete$base[2]) +    
+    theme(axis.line = element_blank(),
+          plot.caption = element_text(margin = margin(5,0,0,0,"mm"),hjust=1))
+```
