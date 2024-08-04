@@ -282,7 +282,7 @@ The above shows how we can construct charts in R. The following section is desig
 
 Kaiser Fung presented the interesting case of a chart from the Princeton alumni magazine reproduced below. As they note, the chart effectively communicates the key message - the share of students receiving financial aid has increased substantially. However, they question whether it is doing it efficiently.
 
-```{r princeton_original, fig.cap = "Original visualisation", fig.height = 2, fig.width = 6}
+```{r princeton_original, fig.cap = "Original visualisation", fig.height = 3, fig.width = 6}
 #| warnings: false  
 #| echo: false  
 princeton_aid.tbl = 
@@ -328,13 +328,13 @@ ggplot(
             margin = margin(1,1,1,1,"mm")),
         legend.position = "bottom",
         legend.justification = "left",
-        legend.margin = margin(-10,0,0,0,"mm"))
+        legend.margin = margin(5,0,0,0,"mm"))
 ```
 
 Fung notes the chart above can be decomposed into two components. For us, these components are reflected in out code by geom_col and geom_text. We present this composition below. This decomposition allows us to consider which part of the original part of the chart is communicating the key message. 
 
 
-```{r princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 2, fig.width = 6}
+```{r princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 3, fig.width = 6}
 #| warnings: false   
 #| echo: false  
 
@@ -362,7 +362,7 @@ ggplot(
             margin = margin(1,1,1,1,"mm")),  
         legend.position = "bottom",        
         legend.justification = "left",     
-        legend.margin = margin(-10,0,0,0,"mm"))
+        legend.margin = margin(5,0,0,0,"mm"))
 
 ggplot(
   data = princeton_aid.tbl |> filter(str_detect(name,"Rec")),
@@ -394,14 +394,14 @@ ggplot(
             margin = margin(1,1,1,1,"mm")),
         legend.position = "bottom",
         legend.justification = "left",
-        legend.margin = margin(-5,0,0,0,"mm"))
+        legend.margin = margin(5,0,0,0,"mm"))
 ```
 
 We can see that both charts still communicates the key message - the share of students receiving financial aid has increased substantially. So, we could achieve our purpose using one or the other rather than needing to present both. Which to use depends on whether you wish to communicate visually (option 1) or textually (option 2). If the latter, it may be worth considering whether a table or prose may be a better format for the information you are presenting.
 
 If the former, it is worth considering whether geom_col with radial coordinates is the best geom_* for this purpose. We can present the same information in a visually simpler style using other geom_*s as shown below.
 
-```{r princeton_line,  fig.cap = "Simplified visualisation", fig.height = 2, fig.width = 6} 
+```{r princeton_line,  fig.cap = "Simplified visualisation", fig.height = 3, fig.width = 6} 
 #| warnings: false  
 #| echo: false    
 
@@ -430,5 +430,5 @@ ggplot(
     scale_colour_manual(
       guide = NULL, name = NULL, values = cube_palettes_discrete$base[2]) +    
     theme(axis.line = element_blank(),
-          plot.caption = element_text(margin = margin(5,0,0,0,"mm"),hjust=1))
+          plot.caption = element_text(margin = margin(2,0,0,0,"mm"),hjust=1))
 ```

@@ -152,7 +152,7 @@ ggplot(
         legend.direction = "vertical",
         legend.title = element_text(margin = margin(0,0,2,0,"mm")))
 
-## ----princeton_original, fig.cap = "Original visualisation", fig.height = 2, fig.width = 6----
+## ----princeton_original, fig.cap = "Original visualisation", fig.height = 3, fig.width = 6----
 princeton_aid.tbl = 
   read_csv(
     "c:/r/training/data/princeton_aid_example.csv",
@@ -196,9 +196,9 @@ ggplot(
             margin = margin(1,1,1,1,"mm")),
         legend.position = "bottom",
         legend.justification = "left",
-        legend.margin = margin(-10,0,0,0,"mm"))
+        legend.margin = margin(5,0,0,0,"mm"))
 
-## ----princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 2, fig.width = 6----
+## ----princeton_decomposed, fig.cap = "Decomposed visualisation", fig.height = 3, fig.width = 6----
 # Create plot in Cube Group style  
 ggplot(
   data = princeton_aid.tbl,  
@@ -223,7 +223,7 @@ ggplot(
             margin = margin(1,1,1,1,"mm")),  
         legend.position = "bottom",        
         legend.justification = "left",     
-        legend.margin = margin(-10,0,0,0,"mm"))
+        legend.margin = margin(5,0,0,0,"mm"))
 
 ggplot(
   data = princeton_aid.tbl |> filter(str_detect(name,"Rec")),
@@ -255,9 +255,9 @@ ggplot(
             margin = margin(1,1,1,1,"mm")),
         legend.position = "bottom",
         legend.justification = "left",
-        legend.margin = margin(-5,0,0,0,"mm"))
+        legend.margin = margin(5,0,0,0,"mm"))
 
-## ----princeton_line,  fig.cap = "Simplified visualisation", fig.height = 2, fig.width = 6----
+## ----princeton_line,  fig.cap = "Simplified visualisation", fig.height = 3, fig.width = 6----
 ggplot(
   data = princeton_aid.tbl|> filter(str_detect(name,"Rec")),
       aes(x = aid_year,
@@ -283,5 +283,5 @@ ggplot(
     scale_colour_manual(
       guide = NULL, name = NULL, values = cube_palettes_discrete$base[2]) +    
     theme(axis.line = element_blank(),
-          plot.caption = element_text(margin = margin(5,0,0,0,"mm"),hjust=1))
+          plot.caption = element_text(margin = margin(2,0,0,0,"mm"),hjust=1))
 
