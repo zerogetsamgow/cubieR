@@ -28,24 +28,28 @@ ggplot(
 geom_bar()
 
 ## ----themed_bar,  fig.height = 4, fig.width = 6-------------------------------
-# Create plot in Cube Group style 
 ggplot(
   data = mtcars,
   aes(x = cyl)
   ) + 
-  geom_bar(fill = cube.darkgreen) +
+  geom_bar(
+    # Assign fill the value of cube.darkgreen
+    fill = cube.darkgreen
+    ) +
+  # Add a theme.
   theme_cube_grey()
 
 ## ----scaled_bar,  fig.height = 4, fig.width = 6-------------------------------
-# Create plot in Cube Group style with formatted axes
 ggplot(
   data = mtcars,  
   aes(x = cyl)) +
   geom_bar(fill = cube.darkgreen) +
+  # Add scale_x_*
   scale_x_continuous(
     name = "Number of cylinders",
     breaks = seq(4,8, by =2),
       )+
+  # Add scale_y_*
   scale_y_continuous(
     name = "Number of cars in dataset",
     expand = c(0,0),
@@ -151,6 +155,23 @@ ggplot(
   theme(legend.position = "right",
         legend.direction = "vertical",
         legend.title = element_text(margin = margin(0,0,2,0,"mm")))
+
+## ----save_plot----------------------------------------------------------------
+# Define local path
+save.path = r"(c:\r\training\plots)"
+# Test if path exists and create if needed
+if(!dir.exists(save.path)) {dir.create(save.path)}
+
+# Use ggsave to save, with a meaningful name
+ggsave(
+  filename = "Plot - mtcars by cyl and geat.png",
+  path = save.path,
+  plot = last_plot(),
+  device = "png",
+  heigh = 8,
+  width = 16,
+  unit = "cm"
+)
 
 ## ----princeton_original, fig.cap = "Original visualisation", fig.height = 3, fig.width = 6----
 princeton_aid.tbl = 

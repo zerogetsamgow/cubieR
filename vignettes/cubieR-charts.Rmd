@@ -96,16 +96,20 @@ To make it easier to quickly format charts in the Cube Group style, we have crea
 
 Importantly a theme_cube_* doesn't change the colours of your `geom_*`. We do that separately by specifying fill inside geom_bar. Note most `geom_*` have two colour variable fill - the inside colour - and colour - the border colour.
 
-Let's see what are chart looks like with a theme and fill.
+Let's see what are chart looks like after adding a theme and assigning the `fill` argument a value.
 
 ``` {r themed_bar,  fig.height = 4, fig.width = 6}
 #| warnings: false 
-# Create plot in Cube Group style 
+
 ggplot(
   data = mtcars,
   aes(x = cyl)
   ) + 
-  geom_bar(fill = cube.darkgreen) +
+  geom_bar(
+    # Assign fill the value of cube.darkgreen
+    fill = cube.darkgreen
+    ) +
+  # Add a theme.
   theme_cube_grey()
 ```
 
@@ -127,15 +131,17 @@ To remove the padding we add `expand = c(0,0)` to `scale_y_continuous`. We also 
 
 ``` {r scaled_bar,  fig.height = 4, fig.width = 6}
 #| warnings: false  
-# Create plot in Cube Group style with formatted axes
+
 ggplot(
   data = mtcars,  
   aes(x = cyl)) +
   geom_bar(fill = cube.darkgreen) +
+  # Add scale_x_*
   scale_x_continuous(
     name = "Number of cylinders",
     breaks = seq(4,8, by =2),
       )+
+  # Add scale_y_*
   scale_y_continuous(
     name = "Number of cars in dataset",
     expand = c(0,0),
@@ -270,6 +276,37 @@ ggplot(
         legend.direction = "vertical",
         legend.title = element_text(margin = margin(0,0,2,0,"mm")))
 ```
+
+# Saving your plot to use in a client deliverable
+
+While it might be nice to produce client deliverables in a markdown document like the one use to produce this vignette, we aren't at that level yet. For now, we need to output our chart in a suitable format to insert into a Microsoft Office document. 
+
+To do this, we use the `ggsave()` function. This functions allows us to specify the device type, resolution and/or size of the object.
+
+My preference is to save the outputs as .png files locally. These are easily copied into Microsoft Office documents. Saving locally is simple and helps you to iteratively refine your plot before adding it to a deliverable.
+
+You can either refer to a named plot or use the `last_plot()` function to save the last plot created 
+
+```{r save_plot}
+#| output: false 
+
+# Define local path
+save.path = r"(c:\r\training\plots)"
+# Test if path exists and create if needed
+if(!dir.exists(save.path)) {dir.create(save.path)}
+
+# Use ggsave to save, with a meaningful name
+ggsave(
+  filename = "Plot - mtcars by cyl and geat.png",
+  path = save.path,
+  plot = last_plot(),
+  device = "png",
+  heigh = 8,
+  width = 16,
+  unit = "cm"
+)
+```
+
 
 
 The following provides a more advanced example. This vignette will be updated to include other examples that bridge the gap between the above and below.

@@ -1,0 +1,497 @@
+---
+title: "cubieR-maps"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cubieR-maps}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+options(verbose=FALSE)
+options(warn.conflicts=FALSE)
+options(tidyverse.quiet = TRUE)
+
+```
+
+
+# Introduction
+
+This document provides instructions on how to produce maps in R. The guide is intended to assist staff at Cube Group to produce maps and associated plots easily and efficiently
+
+The focus is on maps in Australia and particularly Victoria that utilise the {cubepalette} package.
+
+The guide assumes the reader has some familiarity with R and producing plots using {ggplot2}
+
+Required packages
+
+Before we start, it is important to ensure you have the required packages installed.
+
+These include:
+
+``` {r}
+#| output: false 
+library(tidyverse)
+```
+
+As with most coding excercises we will use several function from the tidyverse package. For example, we will create our maps using the {ggplot2} package from the {tidyverse}
+
+``` {r}
+#| output: false   
+library(sf, quietly = TRUE)
+```
+
+The {sf} package provides simple features access for R. This allows us to easily work with map geometries.
+
+``` {r}
+#| output: false  
+library(strayr, quietly = TRUE)
+```
+The {strayr} package provides tools to make working with Australian data easier. In particular, the {strayr} package provides:
+
+- tools to access {sf} objects contained in `absmapsdata`.
+
+- a palette of colours for each state and territory `strayr::palette_state_name_2016`
+
+``` {r}
+#| output: false
+library(cubieR, quietly = TRUE)
+```
+
+The {cubieR} package loads {cubepalette} which enables you to plot in the Cube Group colours and {cubethemes} which provide simple theme for plots in the Cube Group style including theme_cube_map.{r}
+
+``` {r}
+#| output: false 
+library(readabs, quietly = TRUE)
+```
+ Finally, we will use {readabs} to obtain data for some of our examples.
+
+# A simple map
+
+We start by producing a simple map of Australia in the Cube Colours. To do this we obtain geometry data using the 'read_absmap()` function from the {strayr} package. This function allows us to obtain geometry data for many Australian geographies. In this case, we will read the geometries for states and territories. 
+
+See ?strayr::read_absmap for more information on other options.
+
+``` {r state_data}
+#| warnings: false
+# Get data
+state.map.sf = 
+  read_absmap(name = "state2021", remove_year_suffix = TRUE) |> 
+  # Filter to keep only the 8 major states and territories
+  filter(state_code %in% 1:8)
+```
+
+Our data contains one row for each state and territory. Each row contains data on latitude and longitude as well as a geometry variable. It is this variable that allows to produce maps. It is effectively a set of coordinates that define the border of our shapes (polygons) in our map.
+
+``` {r}
+#| echo: false
+# Create table of data in this document
+knitr::kable(state.map.sf)
+``` 
+
+Let's produce a simple map using this data. We use ggplot to construct our initial plot object. Our map is added using geom_sf that maps our simple features. This geom understands the fill and colour aesthetics, which we will assign to colours from {cubepallete}. The theme_cube_map is then applied.
+
+``` {r state_map,  fig.height = 5, fig.width = 6}
+#| outwidth: "100%"
+# Create first version of our map.
+ggplot()+
+  geom_sf(
+    data = state.map.sf,
+    aes(geometry = geometry),
+    fill = cube.lightorange,
+    colour = cube.grey
+    ) +
+  theme_cube_map(base_colour = "green")
+```
+
+This is a very simple map. We can make a few changes to increase the amount of information shown and to improve the projection.
+
+You may notice a small dot off the east coast of Australia. That is likely Norfolk Island which is part of New South Wales. geom_sf includes this as it is part of the geometry for New South Wales. We can't filter it out like we did for the 'Other territories'. We can remove it by limiting the coordinates of our maps using coord_sf().
+
+We will also:
+
+- introduce some colours by linking fill to state_name_au within the aes() function in geom_sf and supplying the palette from {strayr}.
+
+- add labels using geom_text.
+
+``` {r state_map_2,  fig.height = 5, fig.width = 6}
+# Create improved version of our map.
+ggplot()+  
+  geom_sf(
+    data = state.map.sf, 
+    aes(geometry = geometry,
+        fill = state_name_au),
+    colour = cube.grey) + 
+  geom_text(
+    data = state.map.sf, 
+    aes(x = cent_long,
+        y = cent_lat,
+        label = 
+          str_wrap(
+          state_name_au,
+          10)),
+    size = 3,
+    colour = cube.grey,
+    fontface="bold",
+    lineheight = .4) +
+  coord_sf(xlim=c(115,153))+
+  scale_fill_manual(
+    guide = "none", 
+    values =strayr::palette_state_name_2016)+
+  theme_cube_map(base_colour = "green")
+```
+
+This is still a fairly simple chart, but the code illustrates most of the function we will use to build interesting and insightful maps that combine a geometry with data.
+
+# Combining maps with data
+
+While we may use a map like those above for illustrative purposes, more often than not we will want to use the map to provide insight about data. This section will explore how we can do just that.
+
+To begin, we will get state and territory population data using the read_abs() function.
+
+``` {r pop_data}
+# Get population data for Victorian LGAs 
+state.pop.tbl = 
+  read_abs("3101.0") |>
+  # Use function from readabs to separate the series variable into multiple columns
+  separate_series() |> 
+  # Rename series_3 to match our sf data
+  rename(state_name = series_3) |> 
+  # Filter to keep only state and territory data
+  filter(state_name %in% strayr::state_name_au)
+```
+
+This leaves us with the following population data for each state and territory.
+
+
+``` {r}
+#| echo: false 
+# Create table of data in this document 
+knitr::kable(
+  tibble(
+    "Population variables" = 
+      levels(
+        factor(
+          state.pop.tbl$series_2
+          )
+        )
+    )
+  )
+``` 
+
+We will start by plotting net overseas migration data. The following code prepares the data we will use.
+
+``` {r nom_data}
+#| output: false
+#| warnings: false
+# Get Net overseas migration data for states and territories  
+state.nom.tbl =  
+  state.pop.tbl |> 
+  mutate(financial_year=fy::date2fy(date)) |> 
+  # Filter to keep only NOM data for the most recent complete year
+  filter(
+    str_detect(series_2,"Overseas"),
+    financial_year == "2022-23"
+  ) |> 
+  # Aggregate by financial_year
+  group_by(state_name,financial_year, series_2) |> 
+  summarise(value=sum(value))
+```
+
+We now want to combine this with our sf data and plot net overseas migration on a map.
+
+``` {r state_nom_map,  fig.height = 5, fig.width = 6}
+#| warnings: false
+#| 
+# Combine data using a join function
+state.nom.sf =
+  left_join(
+    state.map.sf,
+    state.nom.tbl,
+    # We join on the common variable state_name
+    by = join_by(state_name)
+  )
+
+# Create map using joined data
+ggplot()+  
+  # Add map geom
+  geom_sf(
+    data = state.nom.sf,
+    aes(geometry = geometry,
+        fill = value/1000),
+    colour = cube.grey) +
+  # Add text labels
+  geom_text(
+      data = state.nom.sf,
+      aes(x = cent_long, 
+          y = cent_lat, 
+          label = str_wrap(state_name,10)),
+      size = 3,
+      colour = cube.grey,
+      fontface="bold",
+      lineheight = .4) +  
+  coord_sf(xlim=c(115,153)) +
+  # we use the binned scale function as we have continuous data (value)
+  # but want to have discrete colour bins
+  binned_scale(
+    aesthetics = "fill",
+    name="Net overseas migration, 000s",
+    breaks = seq(0,200,by=25),
+    limits=c(0,200),
+    labels = scales::label_number(),
+    # We use the darkoranges tint palette from cube palettes as it has the most
+    # values. We reverse the palette so larger values are darker colours
+    palette = scales::pal_gradient_n(rev(cube_palettes_tints$darkoranges)))+
+  theme_cube_map(base_colour = "green")
+```
+
+We can make some changes to improve the fomatting of this plot.
+
+Notice, the labels for the Northern Territory and South Australia are barely legible. Switching the colours of these will help. We can do this by applying a filter to the data in geom_text and then adding an additional geom_text layer for the filtered values. Another alternative is to add a geom_text_repel layer to force the labels off the map and onto the background.
+
+We apply both approaches in the code below. We also add to our labels, by including the value of NOM.
+
+``` {r state_nom_map_2,  fig.height = 5, fig.width = 6}
+#| warnings: false 
+ 
+# Combine data 
+
+# Create  map
+ggplot()+   
+# Add map geom   
+  geom_sf(
+    data = state.nom.sf,
+    aes(geometry = geometry, 
+        fill = value/1000),
+    colour = cube.grey) +
+  # Add text labels for standard states  
+  geom_text(
+    data = state.nom.sf |> filter(state_code %in% c(1,3)),
+    aes(x = cent_long,
+        y = cent_lat,
+        label = 
+          str_wrap(
+            str_c(
+              state_name,
+              "\n",
+              signif(value,3)
+              ),
+            10)
+        ), 
+    size = 3,
+    colour = cube.grey,
+    fontface="bold",
+    lineheight = .4) + 
+  # Add text labels for green states  
+  geom_text(
+    data = state.nom.sf |> filter(state_code %in% c(4,5,7)),
+    aes(x = cent_long,
+        y = cent_lat,
+          label = 
+          str_wrap(
+            str_c(
+              state_name,
+              "\n",
+              signif(value,3)
+              ),
+            10)), 
+    size = 3,
+    colour = cube.darkgreen,
+    fontface="bold",
+    lineheight = .4) + 
+  # Add text labels for repel states  
+  ggrepel::geom_text_repel(
+    data = state.nom.sf |> filter(state_code %in% c(2,6,8)),
+    xlim = c(152,155),
+    ylim = c(-35,-50),
+    aes(x = cent_long,
+        y = cent_lat,
+          label = 
+          str_wrap(
+            str_c(
+              state_name,
+              "\n",
+             signif(value,3)
+             ),
+            10)), 
+    size = 3,
+    colour = cube.grey,
+    fontface="bold",
+    lineheight = .4) + 
+  coord_sf(xlim=c(115,156)) + 
+  binned_scale(
+    aesthetics = "fill",
+    name="Net overseas migration, 000s",
+    breaks = seq(0,200,by=25),
+    limits=c(0,200),  
+    labels = scales::label_number(), 
+    palette = scales::pal_gradient_n(rev(cube_palettes_tints$darkoranges))) +
+  theme_cube_map(base_colour = "green")
+```
+
+Our map is now reasonably informative and on the way to being well formatted. We will make any final tweaks when we save the plot.
+
+# Saving your plot to use in a client deliverable
+
+While it might be nice to produce client deliverables in a markdown document like this, we haven't reached that level of sophistication. For now, we need to output our map in a suitable format to insert into a Microsoft Office document. To do this, we use the ggsave() function. This functions allows us to specify the device type, resolution and/or size of the object.
+
+My preference is to save the outputs as .png files locally. These are easily copied into Microsoft Office documents. Saving locally is simple and helps with refinement.
+
+``` {r save_nom_map}
+#| output: false 
+
+# Define local path
+save.path = r"(c:\r\training\plots)"
+# Test if path exists and create if needed
+if(!dir.exists(save.path)) {dir.create(save.path)}
+
+# Use ggsave to save, with a meaningful name
+ggsave(
+  filename = "Map - net overseas migration by state.png",
+  path = save.path,
+  plot = last_plot(),
+  device = "png",
+  width = 15.9,
+  unit = "cm"
+)
+```
+
+# Mapping local government data
+
+For this section we will work with Victorian local government areas as shown below. A note of caution. For most purposes, using ASGS geographies (e.g. SA2, SA4, etc) will produce more meaningful analysis. However, given using LGAs doesn't change the approach I do that here as we will want to use this geography when working with local government clients.
+
+``` {r vic_data,  fig.height = 4, fig.width = 6}
+#| warnings: false
+# Get data for Victorian LGAs 
+lga.map.sf = 
+  read_absmap(
+    name = "lga2021",  
+    remove_year_suffix = TRUE) |>   
+  # Filter to keep only Victorian LGAs 
+  filter(state_code %in% 2)
+
+# Create first version of our map. 
+ggplot()+   
+  geom_sf(  
+    data = lga.map.sf,  
+    aes(geometry = geometry),   
+    fill = cube.lightorange,   
+    colour = cube.grey     
+    ) +
+  theme_cube_map(base_colour = "green") 
+```
+
+We will also look at other ways of obtaining data from useful wesbsites. For example, Small Area Labour Markets | Jobs and Skills Australia. This data can be read in from a .csv file or .xlsx file. The former is easier to work with as we can read them directly from a URL. For the latter, we need to download the file.
+
+``` {r get_salm}
+#| echo: false
+#| warnings: false
+# Provide example of reading csv from a URL and output using kable
+knitr::kable(
+  readr::read_csv("https://www.jobsandskills.gov.au/sites/default/files/2024-04/SALM%20Smoothed%20LGA%20Datafiles%20%28ASGS%202023%29%20-%20December%20quarter%202023.csv", skip = 1) |> 
+    head(),
+  title = "CSV table"
+ )
+
+# Define local path
+data.path = r"(c:\r\training\data)"
+# Test if path exists and create if needed
+if(!dir.exists(data.path)) {dir.create(data.path)}
+
+# Get umpemloyment rate 
+salm.tbl = "https://www.jobsandskills.gov.au/sites/default/files/2024-04/SALM%20Smoothed%20LGA%20Datafiles%20%28ASGS%202023%29%20-%20December%20quarter%202023.xlsx" |> 
+  # Create tibble around url
+  as_tibble_col("url") |> 
+  mutate(
+    # Add download variable using file.path and basename
+    download =
+      file.path(
+        data.path,
+        basename(url)
+        )
+    )  |> 
+  mutate(
+    x = pmap(
+      list(url,download),
+      function(a,b) if(!file.exists(b)) download.file(a,b,mode="wb")
+      )
+  ) |> 
+  mutate(sheets=map(download,readxl::excel_sheets)) |>
+  unnest(sheets) |> 
+ # filter(str_detect(sheets,"rates")) |> 
+  mutate(data=pmap(list(download,sheets), readxl::read_excel, skip=3))  |>
+  unnest(data) |> 
+  select(-1,-2,-3,-4)
+
+knitr::kable(
+  salm.tbl |> 
+    head(),
+  label = "Excel table",
+  format = "simple"
+ )
+```
+
+
+
+``` {r locations_map, fig.height = 5, fig.width = 6}
+#| output: FALSE 
+#| echo: false 
+
+library(tidyverse)
+elc.tbl = read_csv("https://data.ballarat.vic.gov.au/api/v2/catalog/datasets/early-learning-centres/exports/csv?delimiter=%2C")
+
+
+inset_centre <- 
+  st_as_sf(
+  lga.map.sf |> 
+    filter(lga_name=="Ballarat") |> 
+    as_tibble(),
+  coords = c("cent_long","cent_lat"),
+  crs = st_crs(lga.map.sf)
+  ) |> 
+  pull(geometry)
+
+inset_points =
+  st_as_sf(
+  elc.tbl,
+  coords = c("longitude","latitude"),
+  crs = st_crs(lga.map.sf)
+  ) |> 
+  pull(geometry)
+
+library(ggmapinset)
+
+ggplot(data = lga.map.sf)+   
+  geom_sf_inset(
+    aes(geometry = geometry),   
+    fill = cube.lightorange,  
+    colour = cube.grey     
+    ) +
+  geom_inset_frame(colour = cube.green)+
+  geom_sf_text_inset(
+    data=elc.tbl, 
+    aes(
+      geometry = inset_points),
+    label = ".",
+    size = 10,
+    colour = cube.darkorange) +
+  coord_sf_inset(
+    inset = 
+      configure_inset(
+        centre = inset_centre, 
+        scale = 10,
+        radius = 30,
+        translation = c(-600, 100)
+      )
+    ) +
+  theme_cube_map(base_colour = "green") 
+
+```
+# the same plot with an inset zooming in on one area:
+
+
