@@ -203,7 +203,7 @@ state.nom.tbl =
   summarise(value=sum(value))
 ```
 
-We now want to combine this with our sf data and plot net overseas migration on a map.
+We now want to combine this with our sf data and plot net overseas migration on a map. We do this using a join function. {left_join()} takes rach row of `state.map.df` and adds the data from `state.nom.tbl` that has the same value of `state_name`. Having combined the geometry data with the nom data, we can now plot the latter.
 
 ``` {r state_nom_map,  fig.height = 5, fig.width = 6}
 #| warnings: false
@@ -363,7 +363,9 @@ ggsave(
 
 # Mapping local government data
 
-For this section we will work with Victorian local government areas as shown below. A note of caution. For most purposes, using ASGS geographies (e.g. SA2, SA4, etc) will produce more meaningful analysis. However, given using LGAs doesn't change the approach I do that here as we will want to use this geography when working with local government clients.
+For this section we will work with Victorian local government areas as shown below. A note of caution. For most purposes, using ASGS geographies (e.g. SA2, SA4, etc) will produce more meaningful analysis. However, given the availability of data and the nature of our clients, there are occasions where you may want to map data by local government area.
+
+Mapping data by local government area isn't very different to mapping by any other geography. as you can see below.
 
 ``` {r vic_data,  fig.height = 4, fig.width = 6}
 #| warnings: false
@@ -386,7 +388,11 @@ ggplot()+
   theme_cube_map(base_colour = "green") 
 ```
 
-We will also look at other ways of obtaining data from useful wesbsites. For example, Small Area Labour Markets | Jobs and Skills Australia. This data can be read in from a .csv file or .xlsx file. The former is easier to work with as we can read them directly from a URL. For the latter, we need to download the file.
+To make this section more useful, we will also look at other ways of obtaining data from useful wesbsites. 
+
+For example, Small Area Labour Markets data from Jobs and Skills Australia. This data can be read in from a .csv file or .xlsx file. The former is easier to work with as we can read them directly from a URL. For the latter, we need to download the file.
+
+The following code shows how easy it is to work with .csv files and also how to download an .xlsx file from a website.
 
 ``` {r get_salm}
 #| echo: false
@@ -403,7 +409,7 @@ data.path = r"(c:\r\training\data)"
 # Test if path exists and create if needed
 if(!dir.exists(data.path)) {dir.create(data.path)}
 
-# Get umpemloyment rate 
+# Get umpemloyment rate data by defining the url
 salm.tbl = "https://www.jobsandskills.gov.au/sites/default/files/2024-04/SALM%20Smoothed%20LGA%20Datafiles%20%28ASGS%202023%29%20-%20December%20quarter%202023.xlsx" |> 
   # Create tibble around url
   as_tibble_col("url") |> 
@@ -412,6 +418,7 @@ salm.tbl = "https://www.jobsandskills.gov.au/sites/default/files/2024-04/SALM%20
     download =
       file.path(
         data.path,
+        # basename pulls the file name from the url
         basename(url)
         )
     )  |> 
