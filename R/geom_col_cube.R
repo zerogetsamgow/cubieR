@@ -21,6 +21,9 @@
 #'   to the paired geom/stat.
 #' @returns A ggplot object.
 #' @export
+#' @importFrom ggrounded geom_col_rounded
+#' @importFrom ggplot2 unit
+#' @importFrom ggplot2 position_dodge
 #'
 #' @examples
 #' library(ggplot2)
@@ -31,7 +34,7 @@
 
 geom_col_cube <-
   function(
-    radius = grid::unit(.5, "npc"),
+    radius = ggplot2::unit(.5, "npc"),
     position = ggplot2::position_dodge(),
     ...
     )

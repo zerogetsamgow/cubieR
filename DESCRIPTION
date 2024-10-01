@@ -1,13 +1,14 @@
 Package: cubieR
-Title: A collection of tools for Cubies.
-Version: 0.3.1
+Title: A collection of tools for Cubies
+Version: 0.4.0
 Authors@R: 
     person("Samuel", "Gow", , "samuel.gow@cubegroup.com.au", role = c("aut", "cre"))
 Description: cubieR is a package containing tools to be used by staff at
     Cube Group.  These tools are principally geoms, palettes and themes
     used to ensure data visualisations are produced in accordance with the
-    Cube Group branding guidelines.
-License: FALSE
+    Cube Group branding guidelines. 
+    Version 0.4.0 migrated themes from cubethemes to this package.
+License: CC BY 4.0
 URL: https://github.com/zerogetsamgow/cubieR
 BugReports: https://github.com/zerogetsamgow/cubieR/repo/issues
 Encoding: UTF-8
@@ -15,14 +16,26 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports: 
     cubepalette (>= 0.1.0),
-    cubethemes (>= 0.2.0),
-    ggplot2
+    ggplot2,
+    showtext,
+    dplyr,
+    sysfonts,
+    knitr,
+    rmarkdown,
+    scales,
+    stringr,
+    tidyverse,
+    readabs,
+    readr,
+    readxl,
+    ggrepel,
+    ggmapinset,
+    fy,
+    strayr,
+    sf,
 Remotes: 
     https://github.com/zerogetsamgow/cubepalette,
-    https://github.com/zerogetsamgow/cubethemes
 Depends: 
-    ggrounded
-Suggests: 
-    knitr,
-    rmarkdown
+    ggrounded,
+    ggthemes,
 VignetteBuilder: knitr

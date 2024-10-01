@@ -23,11 +23,11 @@ options(tidyverse.quiet = TRUE)
 
 This document provides instructions on how to produce charts in R. The guide is intended to assist staff at Cube Group to produce a variety of charts using our styles and colours easily and efficiently
 
-The focus is producing plots using {ggplot2} and our in-house {cubethemes} and {cubepalette} packages.
+The focus is producing plots using {ggplot2} and our in-house {cubieR} and {cubepalette} packages.
 
 The guide assumes the reader has some familiarity with R.
 
-Required packages
+### Required packages
 
 Before we start, it is important to ensure you have the required packages installed.
 
@@ -50,7 +50,7 @@ As with most coding excercises we will use several function from the tidyverse p
 library(cubieR, quietly = TRUE)
 ```
 
-The `cubieR` package loads `cubepalette` which enables you to plot in the Cube Group colours and `cubethemes` which provides simple themes for plots in the Cube Group style including theme_cube_map.
+The `cubieR` package provides simple themes for plots in the Cube Group style including theme_cube_map and loads `cubepalette` which enables you to plot in the Cube Group colours.
 
 # A simple bar plot
 

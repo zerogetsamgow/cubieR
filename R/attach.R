@@ -1,4 +1,4 @@
-core <- c("cubepalette", "cubethemes")
+core <- c("cubepalette")
 
 core_unloaded <- function() {
   search <- paste0("package:", core)

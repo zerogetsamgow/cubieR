@@ -11,6 +11,9 @@
 #'
 #' @returns A ggplot object.
 #' @export
+#' @importFrom stringr str_detect
+#' @importFrom stringr str_remove
+#' @importFrom ggplot2 scale_colour_manual
 #'
 #' @examples
 #' library(ggplot2)
@@ -21,15 +24,15 @@
 scale_colour_cube = function(cube_theme=c("green","orange","white","grey")){
   if(length(cube_theme)>1) {cube_theme="green"}
   if(is.null(cube_theme)) {cube_theme="green"}
-  if(str_detect(cube_theme,"cube\\.")) {str_remove(cube_theme,"cube\\.")}
+  if(stringr::str_detect(cube_theme,"cube\\.")) {stringr::str_remove(cube_theme,"cube\\.")}
 
   .values =
     switch(cube_theme,
-           "green"=cube_palettes_discrete$light,
-           "orange"=cube_palettes_discrete$other,
-           "white"=cube_palettes_discrete$dark,
-           "grey"=cube_palettes_discrete$grey)
+           "green" = cube_palettes_discrete$light,
+           "orange" = cube_palettes_discrete$other,
+           "white" = cube_palettes_discrete$dark,
+           "grey" = cube_palettes_discrete$grey)
 
-  scale_colour_manual(values=.values)
+  ggplot2::scale_colour_manual(values = .values)
 
 }

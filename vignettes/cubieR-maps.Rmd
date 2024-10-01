@@ -63,7 +63,7 @@ The {strayr} package provides tools to make working with Australian data easier.
 library(cubieR, quietly = TRUE)
 ```
 
-The {cubieR} package loads {cubepalette} which enables you to plot in the Cube Group colours and {cubethemes} which provide simple theme for plots in the Cube Group style including theme_cube_map.{r}
+The {cubieR} package provide simple themes for plots in the Cube Group style including theme_cube_map and loads {cubepalette} which enables you to plot in the Cube Group colours.
 
 ``` {r}
 #| output: false 

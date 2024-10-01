@@ -5,7 +5,7 @@
 \title{Column plot with rounded tops}
 \usage{
 geom_col_cube(
-  radius = grid::unit(0.5, "npc"),
+  radius = ggplot2::unit(0.5, "npc"),
   position = ggplot2::position_dodge(),
   ...
 )

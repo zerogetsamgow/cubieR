@@ -16,6 +16,7 @@
 #'   `colour = "red"` . They may also be parameters to the paired geom/stat.
 #' @returns A ggplot object.
 #' @export
+#' @importFrom ggplot2 geom_line
 #'
 #' @examples
 #' library(ggplot2)
@@ -51,6 +52,7 @@ geom_line_cube <-
 #'   `colour = "red"` . They may also be parameters to the paired geom/stat.
 #' @returns A ggplot object.
 #' @export
+#' @importFrom ggplot2 geom_path
 #'
 #' @examples
 #' library(ggplot2)

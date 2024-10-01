@@ -9,6 +9,7 @@
 #'
 #' @returns a numeric value 1 or 0
 #' @export
+#' @importFrom dplyr if_else
 #'
 #' @examples
 
